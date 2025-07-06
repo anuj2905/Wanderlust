@@ -1,0 +1,97 @@
+<% layout("layouts/boilerplate") %>
+
+<body>
+  <div class="row">
+    <div class="col-8 offset-2">
+      <h3 class="mb-4">Edit Your Listing</h3>
+
+      <!-- Category -->
+      <label for="category" class="form-label">Category</label>
+      <select name="listing[category]" class="form-select mb-3" required>
+        <option value="">-- Select Category --</option>
+        <option value="Beach" <%= listing.category === "Beach" ? "selected" : "" %>>Beach</option>
+        <option value="Mountains" <%= listing.category === "Mountains" ? "selected" : "" %>>Mountains</option>
+        <option value="City" <%= listing.category === "City" ? "selected" : "" %>>City</option>
+        <option value="Forest" <%= listing.category === "Forest" ? "selected" : "" %>>Forest</option>
+        <option value="Island" <%= listing.category === "Island" ? "selected" : "" %>>Island</option>
+        <option value="Adventure" <%= listing.category === "Adventure" ? "selected" : "" %>>Adventure</option>
+        <option value="Camping" <%= listing.category === "Camping" ? "selected" : "" %>>Camping</option>
+        <option value="Arctic" <%= listing.category === "Arctic" ? "selected" : "" %>>Arctic</option>
+        <option value="Boats" <%= listing.category === "Boats" ? "selected" : "" %>>Boats</option>
+        <option value="Heritage" <%= listing.category === "Heritage" ? "selected" : "" %>>Heritage</option>
+      </select>
+
+      <!-- Form -->
+      <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="needs-validation"
+        enctype="multipart/form-data" novalidate>
+
+        <!-- Title -->
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required />
+          <div class="invalid-feedback">Title is required.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea name="listing[description]" class="form-control" required><%= listing.description %></textarea>
+          <div class="invalid-feedback">Description is required.</div>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="mb-3">
+          <label class="form-label">Current Image</label><br>
+          <img src="<%= orignalImageUrl || listing.image.url %>" alt="Listing Image" width="250" class="img-thumbnail">
+        </div>
+
+        <!-- Change Image -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Change Listing Image</label>
+          <input name="listing[image]" type="file" class="form-control" />
+        </div>
+
+        <!-- Price + Country -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="price" class="form-label">Price (₹)</label>
+            <input name="listing[price]" value="<%= listing.price %>" type="number" class="form-control" required />
+            <div class="invalid-feedback">Price is required.</div>
+          </div>
+          <div class="col-md-8">
+            <label for="country" class="form-label">Country</label>
+            <input name="listing[country]" value="<%= listing.country %>" type="text" class="form-control" required />
+            <div class="invalid-feedback">Country is required.</div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="mb-4">
+          <label for="location" class="form-label">Location</label>
+          <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required />
+          <div class="invalid-feedback">Location is required.</div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-warning">Update Listing</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Optional Bootstrap validation
+    (() => {
+      'use strict'
+      const forms = document.querySelectorAll('.needs-validation')
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+  </script>
+</body>
