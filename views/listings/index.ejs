@@ -1,149 +1,73 @@
 <% layout("layouts/boilerplate") %>
 
-<head>
-  <!-- Font Awesome CDN for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <style>
-    #filters {
-      display: flex;
-      gap: 1.5rem;
-      overflow-x: auto;
-      padding: 1rem;
-      border-bottom: 1px solid #ddd;
-      background-color: #f9f9f9;
-      white-space: nowrap;
-    }
+<!-- Category Filters & Tax Toggle -->
+<div class="d-flex flex-wrap align-items-center gap-3 mb-4 px-3">
 
-    .filter {
-      flex: 0 0 auto;
-      text-align: center;
-      font-size: 0.85rem;
-      color: #333;
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: 10px;
-      transition: background-color 0.2s ease-in-out;
-    }
-
-    .filter:hover {
-      background-color: #e2e6ea;
-    }
-
-    .filter i {
-      display: block;
-      font-size: 1.5rem;
-      margin-bottom: 0.25rem;
-      color: #555;
-    }
-
-    .card-price {
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    .tax-price {
-      font-size: 0.85rem;
-      color: #198754;
-    }
-  </style>
-</head>
-
-<body>
 
   <!-- Category Filters -->
-  <div id="filters" class="mb-3">
-    <% const categories = [
-        { name: 'Beach', icon: 'fa-water' },
-        { name: 'Mountains', icon: 'fa-mountain' },
-        { name: 'City', icon: 'fa-city' },
-        { name: 'Forest', icon: 'fa-tree' },
-        { name: 'Island', icon: 'fa-umbrella-beach' },
-        { name: 'Adventure', icon: 'fa-person-hiking' },
-        { name: 'Camping', icon: 'fa-campground' },
-        { name: 'Arctic', icon: 'fa-snowflake' },
-        { name: 'Boats', icon: 'fa-ship' },
-        { name: 'Heritage', icon: 'fa-landmark' },
-      ]; %>
+  <% const categories = [
+    { name: 'Beach', icon: 'fa-water' },
+    { name: 'Mountains', icon: 'fa-mountain' },
+    { name: 'City', icon: 'fa-city' },
+    { name: 'Forest', icon: 'fa-tree' },
+    { name: 'Island', icon: 'fa-umbrella-beach' },
+    { name: 'Adventure', icon: 'fa-person-hiking' },
+    { name: 'Camping', icon: 'fa-campground' },
+    { name: 'Arctic', icon: 'fa-snowflake' },
+    { name: 'Boats', icon: 'fa-ship' },
+    { name: 'Heritage', icon: 'fa-landmark' },
+  ]; %>
 
-    <% categories.forEach(cat => { %>
-      <a href="/listings?category=<%= cat.name %>" class="filter <%= selectedCategory === cat.name ? 'bg-primary text-white' : '' %>">
-        <i class="fa-solid <%= cat.icon %>"></i> <%= cat.name %>
-      </a>
-    <% }) %>
+  <% categories.forEach(cat => { %>
+    <a href="/listings?category=<%= cat.name %>" class="text-decoration-none px-3 py-1 rounded <%= selectedCategory === cat.name ? 'bg-primary text-white' : 'text-dark' %>">
+      <i class="fa-solid <%= cat.icon %> me-1"></i> <%= cat.name %>
+    </a>
+  <% }) %>
+
+   <!-- Tax Toggle -->
+  <div class="form-check form-switch" >
+    <input class="form-check-input" type="checkbox" id="taxToggle">
+    <label class="form-check-label" for="taxToggle">Include Tax</label>
   </div>
+</div>
 
-  <!-- Tax Toggle Switch -->
-  <div class="d-flex justify-content-end align-items-center px-4 mb-2">
-    <label class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" id="taxToggle" />
-      <span class="ms-2">Include 18% Tax</span>
-    </label>
-  </div>
-
-  <!-- Listings -->
-  <div class="container mt-2">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-      <% for (let listing of allListings) { %>
-        <div class="col">
-          <div class="card h-100 shadow-sm">
+<!-- Listings Grid -->
+<div class="container mt-2">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    <% for (let listing of allListings) { %>
+      <div class="col">
+        <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
+          <div class="card h-100 shadow-sm hover-shadow">
             <img src="<%= listing.image.url || 'https://via.placeholder.com/400x300?text=No+Image' %>"
-              class="card-img-top" alt="listing image" height="325rem">
-
-            <div class="card-img-overlay text-white bg-dark bg-opacity-50 p-2" style="pointer-events: none;">
-              Wanderlust
-            </div>
+              class="card-img-top" alt="listing image" height="300rem">
 
             <div class="card-body">
-              <h5 class="card-title">
-                <%= listing.title %>
-              </h5>
+              <h5 class="card-title"><%= listing.title %></h5>
               <p class="card-text">
-                <small class="text-muted">
-                  <%= listing.location %>, <%= listing.country %>
-                </small>
+                <small class="text-muted"><%= listing.location %>, <%= listing.country %></small>
               </p>
-              <p class="card-price">
-                &#8377; <span class="price-raw"><%= listing.price %></span>
-                <span class="tax-price d-none"></span>
+              <p class="fw-bold price-tag" data-base-price="<%= listing.price %>">
+                ₹<%= listing.price.toLocaleString("en-IN") %>
               </p>
-
-              <a href="/listings/<%= listing._id %>" class="btn btn-outline-primary btn-sm mt-2">
-                View Details
-              </a>
             </div>
           </div>
-        </div>
-      <% } %>
-    </div>
+        </a>
+      </div>
+    <% } %>
   </div>
+</div>
 
-  <!-- JavaScript for tax toggle -->
-  <script>
-    const taxToggle = document.getElementById("taxToggle");
+<!-- Tax Toggle Script -->
+<script>
+  const taxToggle = document.getElementById("taxToggle");
 
-    function updateTaxPrices() {
-      const showTax = taxToggle.checked;
-      const cards = document.querySelectorAll(".card");
-
-      cards.forEach(card => {
-        const priceEl = card.querySelector(".price-raw");
-        const taxEl = card.querySelector(".tax-price");
-
-        if (!priceEl || !taxEl) return;
-
-        const base = parseFloat(priceEl.textContent.replace(/,/g, ''));
-        const taxed = Math.round(base * 1.18);
-
-        if (showTax) {
-          taxEl.classList.remove("d-none");
-          taxEl.textContent = `With Tax: ₹${taxed.toLocaleString("en-IN")}`;
-        } else {
-          taxEl.classList.add("d-none");
-          taxEl.textContent = '';
-        }
-      });
-    }
-
-    taxToggle.addEventListener("change", updateTaxPrices);
-  </script>
-</body>
+  taxToggle.addEventListener("change", () => {
+    document.querySelectorAll(".price-tag").forEach(el => {
+      const rawPrice = parseFloat(el.dataset.basePrice);
+      if (!isNaN(rawPrice)) {
+        const finalPrice = taxToggle.checked ? rawPrice * 1.18 : rawPrice;
+        el.textContent = `₹${Math.round(finalPrice).toLocaleString("en-IN")}`;
+      }
+    });
+  });
+</script>

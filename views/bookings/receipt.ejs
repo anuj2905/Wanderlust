@@ -1,0 +1,22 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="receipt border p-4 mt-5 mx-auto" style="max-width:600px; background:#fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+  <h1 class="text-center mb-4 text-uppercase border-bottom pb-2">Receipt</h1>
+
+  <h4><strong>Villa:</strong> <%= listing.title %></h4>
+  <p><strong>Name:</strong> <%= booking.name %></p>
+  <p><strong>DOB:</strong> <%= booking.dob %></p>
+  <p><strong>Email:</strong> <%= booking.email %></p>
+  <p><strong>Mobile:</strong> <%= booking.mobile %></p>
+  <p><strong>Address:</strong> <%= booking.address %></p>
+  <p><strong>Card:</strong> **** **** **** <%= booking.cardNumber.slice(-4) %></p>
+
+
+
+<!-- ✅ Done button -->
+<div class="text-center mt-4">
+  <a href="/listings" class="btn btn-primary" style="padding: 10px 20px; font-size: 18px;">Done</a>
+
+</div>
+
+</div>

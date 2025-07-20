@@ -1,0 +1,27 @@
+<% layout("layouts/boilerplate") %>
+
+<h2 class="text-center my-4">Enter Guest Details</h2>
+
+<form action="/bookings/<%= listing._id %>/payment" method="POST" class="w-50 mx-auto">
+  <div class="mb-3">
+    <label for="name" class="form-label">Full Name</label>
+    <input name="name" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="dob" class="form-label">Date of Birth</label>
+    <input type="date" name="dob" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" name="email" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="mobile" class="form-label">Mobile Number</label>
+    <input type="tel" name="mobile" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="address" class="form-label">Address</label>
+    <textarea name="address" class="form-control" rows="2" required></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary w-100">Next → Payment Info</button>
+</form>

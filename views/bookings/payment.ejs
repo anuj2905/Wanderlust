@@ -1,0 +1,26 @@
+<% layout("layouts/boilerplate") %>
+
+<h2 class="text-center my-4">Enter Card Payment Details</h2>
+
+<form action="/bookings/<%= listing._id %>/receipt" method="POST" class="w-50 mx-auto">
+  <!-- Pass guest details via hidden inputs -->
+  <input type="hidden" name="name" value="<%= guestData.name %>">
+  <input type="hidden" name="dob" value="<%= guestData.dob %>">
+  <input type="hidden" name="email" value="<%= guestData.email %>">
+  <input type="hidden" name="mobile" value="<%= guestData.mobile %>">
+  <input type="hidden" name="address" value="<%= guestData.address %>">
+
+  <div class="mb-3">
+    <label for="cardNumber" class="form-label">Card Number</label>
+    <input type="text" name="cardNumber" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="expiry" class="form-label">Expiry (MM/YY)</label>
+    <input type="text" name="expiry" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label for="cvv" class="form-label">CVV</label>
+    <input type="text" name="cvv" class="form-control" required>
+  </div>
+  <button type="submit" class="btn btn-success w-100">Pay & Generate Receipt</button>
+</form>

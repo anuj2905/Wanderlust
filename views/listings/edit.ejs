@@ -1,5 +1,22 @@
 <% layout("layouts/boilerplate") %>
 
+<head>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map-preview {
+      height: 300px;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    img.img-thumbnail {
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
 <body>
   <div class="row">
     <div class="col-8 offset-2">
@@ -7,23 +24,17 @@
 
       <!-- Category -->
       <label for="category" class="form-label">Category</label>
-      <select name="listing[category]" class="form-select mb-3" required>
-        <option value="">-- Select Category --</option>
-        <option value="Beach" <%= listing.category === "Beach" ? "selected" : "" %>>Beach</option>
-        <option value="Mountains" <%= listing.category === "Mountains" ? "selected" : "" %>>Mountains</option>
-        <option value="City" <%= listing.category === "City" ? "selected" : "" %>>City</option>
-        <option value="Forest" <%= listing.category === "Forest" ? "selected" : "" %>>Forest</option>
-        <option value="Island" <%= listing.category === "Island" ? "selected" : "" %>>Island</option>
-        <option value="Adventure" <%= listing.category === "Adventure" ? "selected" : "" %>>Adventure</option>
-        <option value="Camping" <%= listing.category === "Camping" ? "selected" : "" %>>Camping</option>
-        <option value="Arctic" <%= listing.category === "Arctic" ? "selected" : "" %>>Arctic</option>
-        <option value="Boats" <%= listing.category === "Boats" ? "selected" : "" %>>Boats</option>
-        <option value="Heritage" <%= listing.category === "Heritage" ? "selected" : "" %>>Heritage</option>
-      </select>
+      <select class="form-select mb-3" name="listing[category]" required>
+  <option selected disabled value="">Select a category</option>
+  <option value="Beach" <%= listing.category === 'Beach' ? 'selected' : '' %>>Beach</option>
+  <option value="Mountains" <%= listing.category === 'Mountains' ? 'selected' : '' %>>Mountains</option>
+  <option value="City" <%= listing.category === 'City' ? 'selected' : '' %>>City</option>
+  <!-- Add all categories -->
+</select>
 
-      <!-- Form -->
-      <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="needs-validation"
-        enctype="multipart/form-data" novalidate>
+
+      <!-- Form Start -->
+      <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="needs-validation" enctype="multipart/form-data" novalidate>
 
         <!-- Title -->
         <div class="mb-3">
@@ -42,7 +53,7 @@
         <!-- Image Preview -->
         <div class="mb-3">
           <label class="form-label">Current Image</label><br>
-          <img src="<%= orignalImageUrl || listing.image.url %>" alt="Listing Image" width="250" class="img-thumbnail">
+          <img src="<%= listing.image.url || 'https://via.placeholder.com/300x200?text=No+Image' %>" alt="Listing Image" width="250" class="img-thumbnail">
         </div>
 
         <!-- Change Image -->
@@ -68,9 +79,12 @@
         <!-- Location -->
         <div class="mb-4">
           <label for="location" class="form-label">Location</label>
-          <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required />
+          <input id="location-input" name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required />
           <div class="invalid-feedback">Location is required.</div>
         </div>
+
+        <!-- Location Map Preview -->
+        <div id="map-preview"></div>
 
         <!-- Submit -->
         <button type="submit" class="btn btn-warning">Update Listing</button>
@@ -78,20 +92,63 @@
     </div>
   </div>
 
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
   <script>
-    // Optional Bootstrap validation
+    const locationInput = document.getElementById("location-input");
+    const map = L.map("map-preview").setView([20.5937, 78.9629], 4); // Default India
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    let marker;
+
+    async function updateMapFromLocation(loc) {
+      const query = `${loc}, <%= listing.country %>`;
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (data.length) {
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          map.setView([lat, lon], 10);
+          if (marker) map.removeLayer(marker);
+          marker = L.marker([lat, lon]).addTo(map);
+        }
+      } catch (err) {
+        console.error("Geocoding failed", err);
+      }
+    }
+
+    // On input blur, update map
+    locationInput.addEventListener("blur", () => {
+      if (locationInput.value.trim()) {
+        updateMapFromLocation(locationInput.value.trim());
+      }
+    });
+
+    // Initial map load
+    if (locationInput.value.trim()) {
+      updateMapFromLocation(locationInput.value.trim());
+    }
+  </script>
+
+  <!-- Bootstrap form validation -->
+  <script>
     (() => {
-      'use strict'
-      const forms = document.querySelectorAll('.needs-validation')
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
       Array.from(forms).forEach(form => {
         form.addEventListener('submit', event => {
           if (!form.checkValidity()) {
-            event.preventDefault()
-            event.stopPropagation()
+            event.preventDefault();
+            event.stopPropagation();
           }
-          form.classList.add('was-validated')
-        }, false)
-      })
-    })()
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
   </script>
 </body>

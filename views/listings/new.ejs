@@ -1,12 +1,23 @@
 <% layout("layouts/boilerplate") %>
 
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map-preview {
+      height: 300px;
+      border-radius: 8px;
+      margin-top: 1rem;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
 <body>
   <div class="row">
     <div class="col-8 offset-2">
       <h3 class="mb-4">Create a New Listing</h3>
 
       <form method="POST" action="/listings" class="needs-validation" novalidate enctype="multipart/form-data">
-
         <!-- Title -->
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
@@ -69,11 +80,51 @@
           <div class="invalid-feedback">Please enter a location.</div>
         </div>
 
+        <!-- Live Map Preview -->
+        <div id="map-preview"></div>
+
         <!-- Submit -->
-        <button type="submit" class="btn btn-primary">Add Listing</button>
+        <button type="submit" class="btn btn-primary mt-4">Add Listing</button>
       </form>
     </div>
   </div>
+
+  <!-- Leaflet and Map Preview Script -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map-preview').setView([20.5937, 78.9629], 4); // Default: India
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker;
+
+    function updateMapPreview() {
+      const location = document.getElementById('location').value;
+      const country = document.getElementById('country').value;
+      const query = `${location}, ${country}`;
+
+      if (!location || !country) return;
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length) {
+            const { lat, lon } = data[0];
+            map.setView([lat, lon], 13);
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lon]).addTo(map)
+              .bindPopup(`${location}, ${country}`)
+              .openPopup();
+          }
+        });
+    }
+
+    // Auto-update map when user types
+    document.getElementById('location').addEventListener('input', updateMapPreview);
+    document.getElementById('country').addEventListener('input', updateMapPreview);
+  </script>
 
   <!-- Optional JS validation -->
   <script>

@@ -77,3 +77,32 @@ body{
     opacity: 0.2;
     background-color: white;
 }
+
+
+.receipt {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  border: 2px solid black;
+  background: #fdfdfd;
+  font-family: serif;
+}
+.receipt h1 {
+  text-align: center;
+  text-decoration: underline;
+}
+
+
+.receipt {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 25px;
+  border: 2px solid #333;
+  background: #f8f8f8;
+  font-family: 'Georgia', serif;
+}
+.receipt h1 {
+  text-align: center;
+  text-transform: uppercase;
+  border-bottom: 2px dashed black;
+}

@@ -1,82 +1,24 @@
-
-
-// const { string } = require("joi");
-// const mongoose = require("mongoose");
-// const Schema = mongoose.Schema;
-
-// const listingSchema = new Schema({
-//   title: String,
-//   description: String,
-//   image: {
-//     url : String,
-//     filename : String,
-//   },
-//   price: Number,
-//   country :String,
-//   location: String,
-//   owner: {
-//     type: Schema.Types.ObjectId,
-//     ref: "User",
-//     required: true
-//   },
-//   reviews: [
-//     {
-//       type: Schema.Types.ObjectId,
-//       ref: "Review"
-//     }
-//   ]
-// });
-
-// const Listing = mongoose.model("Listing", listingSchema);
-// module.exports = Listing;
-
-
-
-
 const mongoose = require("mongoose");
+const Review = require("./review");
 
 const listingSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
+  title: String,
+  description: String,
   image: {
     url: String,
     filename: String,
   },
-  price: {
-    type: Number,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  country: {
-    type: String,
-    required: true,
-  },
+  price: Number,
+  location: String,
+  country: String,
+
+  // ✅ Add this line for category
   category: {
     type: String,
-    enum: [
-      "Beach",
-      "Mountains",
-      "City",
-      "Forest",
-      "Island",
-      "Adventure",
-      "Camping",
-      "Arctic",
-      "Boats",
-      "Heritage",
-    ],
+    required: true
   },
-  latitude: Number,
-  longitude: Number,
+
+
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -89,7 +31,11 @@ const listingSchema = new mongoose.Schema({
   ],
 });
 
-const Listing = mongoose.model("Listing", listingSchema);
+// When a listing is deleted, delete all its associated reviews
+listingSchema.post("findOneAndDelete", async function (listing) {
+  if (listing) {
+    await Review.deleteMany({ _id: { $in: listing.reviews } });
+  }
+});
 
-module.exports = Listing;
-
+module.exports = mongoose.model("Listing", listingSchema);
