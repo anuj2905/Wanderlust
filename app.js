@@ -1,7 +1,7 @@
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-console.log(process.env);
+console.log(process.env.ATLASDB_URL ? "DB URL Loaded" : "DB URL Missing");
 
 // Required Modules
 const express = require("express");
@@ -22,11 +22,6 @@ const Listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 const User = require("./models/user.js");
 
-// Utilities
-const wrapAsync = require("./until/wrapasync.js");
-const ExpressError = require("./until/ExpressError.js");
-const { listingSchema, reviewSchema } = require("./schema.js");
-
 // Routers
 const userRouter = require("./routes/user.js");
 const listingsRouter = require("./routes/listing.js");
@@ -34,10 +29,18 @@ const reviewsRouter = require("./routes/reviews.js");
 
 // MongoDB Connection
 const dbUrl = process.env.ATLASDB_URL;
+
 async function main() {
   await mongoose.connect(dbUrl);
 }
-main().catch((err) => console.log(err));
+
+main()
+  .then(() => {
+    console.log("✅ MongoDB Connected");
+  })
+  .catch((err) => {
+    console.log("❌ MongoDB Connection Error:", err);
+  });
 
 // App Configuration
 app.set("view engine", "ejs");
@@ -57,7 +60,7 @@ const store = MongoStore.create({
 });
 
 store.on("error", (err) => {
-  console.log("Error in mongo session store", err);
+  console.log("❌ Error in Mongo session store:", err);
 });
 
 // Session Configuration
@@ -65,7 +68,7 @@ const sessionOption = {
   store,
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -95,7 +98,7 @@ app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use(userRouter);
 
-// 🏨 Booking Flow Routes
+// Booking Flow Routes
 app.get("/bookings/:id/details", async (req, res) => {
   const { id } = req.params;
   const listing = await Listing.findById(id);
@@ -122,7 +125,8 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs", { message });
 });
 
-// Start Server
-app.listen(8080, () => {
-  console.log("Server is listening on port 8080");
+// ⭐ IMPORTANT: Dynamic Port for Render
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
 });
