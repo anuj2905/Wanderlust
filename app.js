@@ -93,6 +93,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// ⭐ Redirect root URL to /listings
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
+
 // Routes
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
@@ -125,7 +130,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs", { message });
 });
 
-// ⭐ IMPORTANT: Dynamic Port for Render
+// Dynamic Port for Render
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
